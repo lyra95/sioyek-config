@@ -1,0 +1,2 @@
+[tool.uv.workspace]
+members = ["packages/dictionary-lookup", "packages/selected-text-translate"]
