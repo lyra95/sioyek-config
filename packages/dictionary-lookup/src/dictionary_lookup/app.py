@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import argparse
 import logging
+import os
 import re
+import sys
 from pathlib import Path
 
 from .instance import run_single_instance
@@ -14,6 +16,7 @@ from .window import run_window
 
 def main() -> None:
     _configure_logging()
+    _configure_tk_libraries()
     parser = argparse.ArgumentParser(description="Look up a word in Oxford or Naver English Dictionary.")
     parser.add_argument("--engine", choices=("oxford", "naver"), default="oxford")
     parser.add_argument("word", nargs="*", help="word or phrase to look up")
@@ -43,6 +46,23 @@ def _configure_logging() -> None:
     except OSError:
         # Logging must never prevent a lookup from opening.
         pass
+
+
+def _configure_tk_libraries() -> None:
+    """Point uv's managed Python at the Tcl/Tk files it ships outside the venv.
+
+    Tcl looks for its library under ``sys.prefix``, but uv keeps it with the
+    interpreter, so every virtual environment needs the location spelled out.
+    """
+    base = Path(sys.base_prefix) / "lib"
+    for variable, pattern, marker in (
+        ("TCL_LIBRARY", "tcl[0-9]*", "init.tcl"),
+        ("TK_LIBRARY", "tk[0-9]*", "tk.tcl"),
+    ):
+        for directory in sorted(base.glob(pattern), reverse=True):
+            if (directory / marker).is_file():
+                os.environ.setdefault(variable, str(directory))
+                break
 
 
 if __name__ == "__main__":

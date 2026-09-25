@@ -23,6 +23,11 @@ terminal's `PATH`, so using only `dictionary-lookup` or
 startup and uncaught launch errors are recorded in
 `~/Library/Logs/sioyek-text-tools.log`.
 
+Both tools point `TCL_LIBRARY`/`TK_LIBRARY` at their uv-managed Python before
+opening a window. Tcl searches for its library under the virtual environment's
+prefix, while uv keeps Tcl/Tk next to the interpreter, so without this every
+`tkinter` window fails with `Can't find a usable init.tcl`.
+
 Select a word or phrase and press **F8**, then **o**. The first lookup opens a
 standalone window. Later lookups send the new selection to that process,
 refresh the same window, and bring it to the front. Oxford is selected by

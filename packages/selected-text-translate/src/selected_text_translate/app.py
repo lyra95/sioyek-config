@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import argparse
 import logging
+import os
 import re
+import sys
 from pathlib import Path
 
 from .config import load_dotenv
@@ -22,6 +24,7 @@ ENGINES = {
 
 def main() -> None:
     _configure_logging()
+    _configure_tk_libraries()
     load_dotenv()
     parser = argparse.ArgumentParser(description="Translate selected text into Korean.")
     parser.add_argument(
@@ -62,6 +65,23 @@ def _configure_logging() -> None:
     except OSError:
         # Logging must never prevent a translation window from opening.
         pass
+
+
+def _configure_tk_libraries() -> None:
+    """Point uv's managed Python at the Tcl/Tk files it ships outside the venv.
+
+    Tcl looks for its library under ``sys.prefix``, but uv keeps it with the
+    interpreter, so every virtual environment needs the location spelled out.
+    """
+    base = Path(sys.base_prefix) / "lib"
+    for variable, pattern, marker in (
+        ("TCL_LIBRARY", "tcl[0-9]*", "init.tcl"),
+        ("TK_LIBRARY", "tk[0-9]*", "tk.tcl"),
+    ):
+        for directory in sorted(base.glob(pattern), reverse=True):
+            if (directory / marker).is_file():
+                os.environ.setdefault(variable, str(directory))
+                break
 
 
 if __name__ == "__main__":
