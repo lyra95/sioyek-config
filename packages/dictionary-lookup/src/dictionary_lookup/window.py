@@ -35,10 +35,32 @@ def run_window(initial_word: str, server: socket.socket, default_engine: str = "
     )
     selector.pack(side="left", padx=(6, 0))
 
-    text = ScrolledText(root, wrap="word", padx=16, pady=12, font=("Segoe UI", 11))
+    font_size = tk.IntVar(value=15)
+    ttk.Label(toolbar, text="Font size:").pack(side="left", padx=(16, 0))
+    font_size_input = ttk.Spinbox(toolbar, from_=8, to=32, textvariable=font_size, width=4)
+    font_size_input.pack(side="left", padx=(6, 0))
+
+    text = ScrolledText(root, wrap="word", padx=16, pady=12, font=("Segoe UI", font_size.get()))
     text.pack(fill="both", expand=True)
-    text.tag_configure("title", font=("Segoe UI", 18, "bold"), foreground="#1769aa")
     text.tag_configure("error", foreground="#aa2222")
+
+    def apply_font_size(*_args: object) -> None:
+        try:
+            size = max(8, min(32, int(font_size.get())))
+        except tk.TclError:
+            return
+        if size != font_size.get():
+            font_size.set(size)
+            return
+        text.configure(font=("Segoe UI", size))
+        text.tag_configure("title", font=("Segoe UI", size + 7, "bold"), foreground="#1769aa")
+
+    def adjust_font_size(amount: int) -> str:
+        font_size.set(max(8, min(32, font_size.get() + amount)))
+        return "break"
+
+    font_size.trace_add("write", apply_font_size)
+    apply_font_size()
     updates: queue.Queue[str] = queue.Queue()
     result_queue: queue.Queue[tuple[int, str, str, LookupResult | None, str | None]] = queue.Queue()
     current_request = 0
@@ -116,6 +138,10 @@ def run_window(initial_word: str, server: socket.socket, default_engine: str = "
         root.after(100, poll)
 
     selector.bind("<<ComboboxSelected>>", change_engine)
+    for modifier in ("Control", "Command"):
+        root.bind_all(f"<{modifier}-plus>", lambda _event: adjust_font_size(1))
+        root.bind_all(f"<{modifier}-equal>", lambda _event: adjust_font_size(1))
+        root.bind_all(f"<{modifier}-minus>", lambda _event: adjust_font_size(-1))
     start_message_server(server, "word", updates.put)
     show_word(initial_word)
     poll()

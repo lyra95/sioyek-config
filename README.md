@@ -33,6 +33,9 @@ Naver English Dictionary selected.
 Dictionary searches query the selected form plus its WordNet lemmas across
 noun, verb, adjective, adverb, and satellite adjective categories. On first
 use, the app downloads NLTK's WordNet data if it is not already installed.
+Both the dictionary and translator windows have a **Font size** control
+(8–32 pt). You can also use `Ctrl`/`Cmd` + `+` or `-` to adjust it while the
+window is focused.
 The translator can be launched with
 `uv run --project packages/selected-text-translate selected-text-translate TEXT`.
 Set its initial engine with `--engine google`, `--engine deepl`,
