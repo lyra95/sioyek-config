@@ -7,11 +7,21 @@ them through `uv run`; both use Python's standard library and Tkinter.
 
 1. Install uv and Python 3 with Tkinter.
 2. Run `make install` to install the two `uv` tools and copy the Sioyek config
-   files to the platform's Sioyek folder. On macOS this is
-   `~/Library/Application Support/sioyek`; on Windows the script locates the
+   files to the platform's Sioyek folder. On macOS, it prompts for an
+   administrator password and installs the tool environments in
+   `/usr/local/share/uv/tools` and their commands in `/usr/local/bin`, making
+   them available to all users. The Sioyek config files are copied to
+   `~/Library/Application Support/sioyek`. On Windows the script locates the
    WinGet Sioyek installation folder.
 3. Copy `.env.example` to `.env` and fill in `DEEPL_AUTH_KEY` if you use DeepL.
 4. Reload Sioyek's configuration.
+
+On macOS the commands in `prefs_user.config` deliberately use their absolute
+`/usr/local/bin` paths. Finder-launched applications do not inherit your
+terminal's `PATH`, so using only `dictionary-lookup` or
+`selected-text-translate` makes the shortcuts appear to do nothing. Tool
+startup and uncaught launch errors are recorded in
+`~/Library/Logs/sioyek-text-tools.log`.
 
 Select a word or phrase and press **F8**, then **o**. The first lookup opens a
 standalone window. Later lookups send the new selection to that process,
