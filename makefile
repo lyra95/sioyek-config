@@ -1,5 +1,7 @@
 .PHONY: install
 
+INSTALL_TOOLS = uv tool install --editable
+
 ifeq ($(OS),Windows_NT)
 INSTALL_CONFIG = pwsh -ExecutionPolicy Bypass -File install-keys.ps1
 else
@@ -13,8 +15,6 @@ UV_TOOL_DIR ?= /usr/local/share/uv/tools
 UV_TOOL_BIN_DIR ?= /usr/local/bin
 UV = $(shell command -v uv)
 INSTALL_TOOLS = sudo env UV_TOOL_DIR="$(UV_TOOL_DIR)" UV_TOOL_BIN_DIR="$(UV_TOOL_BIN_DIR)" "$(UV)" tool install --editable
-else
-INSTALL_TOOLS = uv tool install --editable
 endif
 endif
 
